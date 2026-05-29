@@ -205,7 +205,10 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          mapfile -t ASSETS < <(find dist-mac -type f \( \
+          ASSETS=()
+          while IFS= read -r asset; do
+            ASSETS+=("$asset")
+          done < <(find dist-mac -type f \( \
             -name "*.dmg" -o \
             -name "*.zip" -o \
             -name "latest-mac.yml" \
