@@ -80,6 +80,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     writeText: (payload) => ipcRenderer.invoke("clipboard:writeText", payload),
     readText: () => ipcRenderer.invoke("clipboard:readText"),
   },
+  canvasVisualSnapshot: {
+    capturePage: (payload) =>
+      ipcRenderer.invoke("canvasVisualSnapshot:capturePage", payload),
+  },
   screenshot: {
     captureDisplay: () => ipcRenderer.invoke("screenshot:captureDisplay"),
     onGlobalCapture: (callback) => {

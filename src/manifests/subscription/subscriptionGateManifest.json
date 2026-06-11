@@ -29,6 +29,17 @@
       ]
     },
     {
+      "key": "runninghubVideoScail2V1",
+      "modelId": "runninghub/2064961300823896065",
+      "workflowId": "2064961300823896065",
+      "displayName": "视频编辑Scail2 V1",
+      "aliases": [
+        "video_edit_v54",
+        "video_edit.pro",
+        "ai-app/2064961300823896065"
+      ]
+    },
+    {
       "key": "runninghubVideoHd",
       "modelId": "runninghub/2047787809091620866",
       "workflowId": "2047787809091620866",

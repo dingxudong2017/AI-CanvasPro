@@ -1,3 +1,24 @@
+🎉 V0.4.10 版本更新啦！
+
+[previewVideoUrl]: https://www.bilibili.com/video/BV1RX5z6gEXq/
+
+✨ 新增功能：
+- 视频生成节点 新增runninghub工作流 “视频编辑-Scail2 V1-支持长视频“ vip限定
+- 新增 图片双击放大后 的放大缩小位移操作
+- 新增apimart切换线路 在设置-cdkey-apimart选择
+- 新增 “生成按钮” Enter键防误触功能 设置-常规-提示词回车行为
+- 新增 “英文界面”完成程度大概90% 设置-常规-语音 里面选择 
+
+
+🐛 修复与优化：
+- 修复runninghub工作流 会保存两个同样结果的问题
+
+
+AI-CanvasPro！ windows/mac 应用版本已发布 欢迎体验！ 
+BUG问题或要新增功能反馈文档：https://i1etb6xynr.feishu.cn/wiki/N2C3wD6SgisOpek11mfcfJCinkr?from=from_copylink
+
+---
+
 🎉 V0.4.9 版本更新啦！
 
 [previewVideoUrl]: https://www.bilibili.com/video/BV1RX5z6gEXq/

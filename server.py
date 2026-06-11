@@ -78,6 +78,27 @@ STATIC_VIDEO_CACHE_EXTS = {
     ".mpg",
 }
 DERIVED_MEDIA_CACHE_CONTROL = "public, max-age=604800, immutable"
+APIMART_DEFAULT_API_URL = "https://api.apib.ai"
+
+
+def _normalize_apimart_base_url(value):
+    raw = str(value or APIMART_DEFAULT_API_URL).strip().rstrip("/")
+    return re.sub(r"/v1/?$", "", raw, flags=re.IGNORECASE)
+
+
+def _build_apimart_presign_url(api_url):
+    normalized_api_url = _normalize_apimart_base_url(api_url)
+    try:
+        parsed = urllib.parse.urlsplit(normalized_api_url)
+        if not parsed.scheme or not parsed.hostname:
+            raise ValueError("invalid APIMart api url")
+        host = re.sub(r"^api\.", "", parsed.hostname, flags=re.IGNORECASE)
+        netloc = host
+        if parsed.port:
+            netloc = f"{host}:{parsed.port}"
+        return urllib.parse.urlunsplit((parsed.scheme, netloc, "/api/upload/presign", "", ""))
+    except Exception:
+        return "https://apib.ai/api/upload/presign"
 STATIC_VIDEO_CACHE_CONTROL = "public, max-age=86400"
 NO_STORE_CACHE_CONTROL = "no-store, no-cache, must-revalidate, max-age=0"
 SMART_CLIP_MIN_SEGMENTS = 2
@@ -2629,7 +2650,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 file_content_type = "application/octet-stream"
                 file_extension = ""
                 api_key = ""
-                api_url = "https://api.apimart.ai"
+                api_url = APIMART_DEFAULT_API_URL
                 permanent = False
                 file_bytes = b""
 
@@ -2672,7 +2693,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             elif field_name == "apiKey":
                                 api_key = re.sub(r"^Bearer\s+", "", value, flags=re.IGNORECASE).strip()
                             elif field_name == "apiUrl" and value:
-                                api_url = re.sub(r"/v1/?$", "", value.rstrip("/"), flags=re.IGNORECASE)
+                                api_url = _normalize_apimart_base_url(value)
                 else:
                     file_bytes = body
                     file_content_type = content_type_header.split(";", 1)[0].strip() or file_content_type
@@ -2685,12 +2706,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     file_extension = (mimetypes.guess_extension(file_content_type) or ".bin").lstrip(".")
 
                 if api_key and file_content_type.lower().startswith("image/"):
-                    normalized_api_url = re.sub(
-                        r"/v1/?$",
-                        "",
-                        str(api_url or 'https://api.apimart.ai').strip().rstrip("/"),
-                        flags=re.IGNORECASE,
-                    )
+                    normalized_api_url = _normalize_apimart_base_url(api_url)
                     upload_url = f"{normalized_api_url}/v1/uploads/images"
                     try:
                         import requests as _req
@@ -2763,10 +2779,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     "fileExtension": file_extension,
                     "permanent": bool(permanent),
                 }
+                presign_url = _build_apimart_presign_url(api_url)
                 try:
                     import requests as _req
                     presign_resp = _req.post(
-                        "https://apimart.ai/api/upload/presign",
+                        presign_url,
                         json=presign_payload,
                         headers={
                             "Content-Type": "application/json",
@@ -2790,7 +2807,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 except ImportError:
                     req_body = json.dumps(presign_payload).encode("utf-8")
                     req = urllib.request.Request(
-                        "https://apimart.ai/api/upload/presign",
+                        presign_url,
                         data=req_body,
                         headers={
                             "Content-Type": "application/json",
